@@ -1,0 +1,3 @@
+select id, name, types, height, weight, attack from pokemon
+    -> inner join about on pokemon.id = about.id_pokemon
+    -> join stats on pokemon.id = stats.id_pokemon;
