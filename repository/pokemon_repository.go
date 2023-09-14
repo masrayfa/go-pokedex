@@ -15,7 +15,7 @@ type PokemonRepository interface {
 	FindAllTypesByPokemonId(ctx context.Context, tx *sql.Tx, pokemonId int64) ([]string, error)
 	FindAllAbilitiesByPokemonId(ctx context.Context, tx *sql.Tx, pokemonId int64) ([]string, error)
 	FindAllSpeciesByPokemonId(ctx context.Context, tx *sql.Tx, pokemonId int64) ([]string, error)
-	Save(ctx context.Context, tx *sql.Tx, pokemon domain.Pokemon) (domain.Pokemon, error)
+	Save(ctx context.Context, tx *sql.Tx, pokemon domain.Pokemon, userId int) (domain.Pokemon, error)
 	Update(ctx context.Context, tx *sql.Tx, pokemon domain.Pokemon) (web.PokemonResponse, error)
 	Delete(ctx context.Context, tx *sql.Tx, id int) 
 }

@@ -11,12 +11,12 @@ import (
 type UserRepositoryImpl struct {
 }
 
-func NewUserRepositoryImpl() UserRepositoryImpl {
+func NewUserRepository() UserRepositoryImpl {
 	return UserRepositoryImpl{}
 }
 
 func (userRepositoryImpl UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]domain.User, error) {
-	script := "SELECT id, name from user"
+	script := "SELECT id, name, pokemon from user where "
 	rows, err := tx.QueryContext(ctx, script)
 	helper.PanicIfError(err)
 	defer rows.Close()

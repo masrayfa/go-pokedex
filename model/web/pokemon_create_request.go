@@ -7,4 +7,5 @@ type PokemonCreateRequest struct {
 	Types  string       `json:"types"`
 	About  domain.About `json:"about"`
 	Stats  domain.Stats `json:"stats"`
+	UserId int        `json:"user_id"`
 }

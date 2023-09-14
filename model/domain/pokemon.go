@@ -1,11 +1,12 @@
 package domain
 
 type Pokemon struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	About About  `json:"about"`
-	Types string `json:"types"`
-	Stats Stats  `json:"stats"`
+	Id     int    `json:"id"`
+	Name   string `json:"name"`
+	About  About  `json:"about"`
+	Types  string `json:"types"`
+	Stats  Stats  `json:"stats"`
+	UserId int    `json:"user_id"`
 }
 
 type About struct {

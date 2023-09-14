@@ -51,10 +51,16 @@ func (service *PokemonServiceImpl) Create(ctx context.Context, req web.PokemonCr
 			Speed: req.Stats.Speed,
 		},
 		Types: req.Types,
+		UserId: req.UserId,
+	}
+
+	user, err := service.PokemonRepository.FindById(ctx, tx, req.UserId)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
 	}
 
 	// pokemon := web.PokemonResponseToDomain(req)
-	res, err := service.PokemonRepository.Save(ctx, tx, pokemon)
+	res, err := service.PokemonRepository.Save(ctx, tx, pokemon, user.Id) 
 	helper.PanicIfError(err)
 
 	return helper.ToPokemonResponse(res), nil

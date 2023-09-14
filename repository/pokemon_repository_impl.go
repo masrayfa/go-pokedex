@@ -133,9 +133,9 @@ func (pokemonRepositoryImpl PokemonRepositoryImpl) FindAllSpeciesByPokemonId(ctx
 	return species, nil
 }
 
-func (pokemonRepositoryImpl PokemonRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, pokemon domain.Pokemon) (domain.Pokemon, error) {
-	scriptPokemon := "INSERT INTO pokemon(name, types) VALUES (?, ?)"
-	resultPokemonTable, err := tx.ExecContext(ctx, scriptPokemon, pokemon.Name, pokemon.Types)
+func (pokemonRepositoryImpl PokemonRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, pokemon domain.Pokemon, userId int) (domain.Pokemon, error) {
+	scriptPokemon := "INSERT INTO pokemon(name, types, id_user) VALUES (?, ?, ?)"
+	resultPokemonTable, err := tx.ExecContext(ctx, scriptPokemon, pokemon.Name, pokemon.Types, userId)
 	helper.PanicIfError(err)
 
 	lastInsertId, err := resultPokemonTable.LastInsertId()

@@ -15,11 +15,19 @@ func main() {
 	db := app.NewDB()
 
 	validate := validator.New()
+	// Reposistory
 	pokemonRepository := repository.NewPokemonRepository()
-	pokemonService := service.NewPokemonService(pokemonRepository, db, validate)
-	pokemonController := controller.NewPokemonController(pokemonService)
+	userRepository := repository.NewUserRepository()
 
-	router := app.NewRouter(pokemonController)
+	// Service
+	pokemonService := service.NewPokemonService(pokemonRepository, db, validate)
+	userService := service.NewUserService(userRepository, db, validate)
+
+	// Controller
+	pokemonController := controller.NewPokemonController(pokemonService)
+	userController := controller.NewUserController(userService)
+
+	router := app.NewRouter(pokemonController, userController)
 
 	server := http.Server{
 		Addr:   "localhost:8080",
