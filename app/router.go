@@ -11,11 +11,12 @@ func NewRouter(pokemonController controller.PokemonController, userController co
 	router := httprouter.New()
 
 	// Pokemon routes
-	router.POST("/api/pokemon", pokemonController.Create)
-	router.PUT("/api/pokemon/:pokemonId", pokemonController.Update)
 	router.GET("/api/pokemon", pokemonController.FindAll)
+	router.GET("/api/pokemon/collections/:userId", pokemonController.FindCollections)
 	router.GET("/api/pokemon/id/:pokemonId", pokemonController.FindById)
 	router.GET("/api/pokemon/name/:pokemonName", pokemonController.FindByName)
+	router.POST("/api/pokemon", pokemonController.Create)
+	router.PUT("/api/pokemon/:pokemonId", pokemonController.Update)
 	router.DELETE("/api/pokemon/:pokemonId", pokemonController.Delete)
 
 	// User routes

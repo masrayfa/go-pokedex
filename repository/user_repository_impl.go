@@ -16,7 +16,7 @@ func NewUserRepository() UserRepositoryImpl {
 }
 
 func (userRepositoryImpl UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]domain.User, error) {
-	script := "SELECT id, name, pokemon from user where "
+	script := "SELECT id, name, pokemon from user where id = ?"
 	rows, err := tx.QueryContext(ctx, script)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -32,8 +32,8 @@ func (userRepositoryImpl UserRepositoryImpl) FindAll(ctx context.Context, tx *sq
 	return users, nil
 }
 
-func (userRepositoryImpl UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int64) (domain.User, error) {
-	script := "SELECT id, name from user where id = ?"
+func (userRepositoryImpl UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (domain.User, error) {
+	script := "SELECT id, username from user where id = ?"
 	rows, err := tx.QueryContext(ctx, script, id)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -49,7 +49,7 @@ func (userRepositoryImpl UserRepositoryImpl) FindById(ctx context.Context, tx *s
 }
 
 func (userRepositoryImpl UserRepositoryImpl) FindByUsername(ctx context.Context, tx *sql.Tx, username string) (domain.User, error) {
-	script := "SELECT id, name from user where username = ?"
+	script := "SELECT id, username from user where username = ?"
 	row := tx.QueryRowContext(ctx, script, username)
 
 	var user domain.User
@@ -77,7 +77,7 @@ func (userRepositoryImpl UserRepositoryImpl) Save(ctx context.Context, tx *sql.T
 
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
-	user.Id = id
+	user.Id = int(id) // convert int64 to int
 
 	return user, nil
 }
@@ -90,7 +90,7 @@ func (userRepositoryImpl UserRepositoryImpl) Update(ctx context.Context, tx *sql
 	return user, nil
 }
 
-func (userRepositoryImpl UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int64) error {
+func (userRepositoryImpl UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int) error {
 	script := "DELETE FROM user WHERE id = ?"
 	_, err := tx.ExecContext(ctx, script, id)
 	helper.PanicIfError(err)

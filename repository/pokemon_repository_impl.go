@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"ngacak-go/helper"
 	"ngacak-go/model/domain"
 	"ngacak-go/model/web"
@@ -21,11 +22,40 @@ func (pokemonRepositoryImpl PokemonRepositoryImpl) FindAll(ctx context.Context, 
 	script := `SELECT id, name, types, species, height, weight, abilities, hp, attack, defense, speed
 	FROM pokemon 
 	INNER JOIN about ON pokemon.id = about.id_pokemon 
-	JOIN stats ON pokemon.id = stats.id_pokemon`
+	JOIN stats ON pokemon.id = stats.id_pokemon
+	`
+
+	fmt.Println("ini script", script)
 
 	rows, err := tx.QueryContext(ctx, script)
 	helper.PanicIfError(err)
 	defer rows.Close()
+
+	var pokemons []domain.Pokemon
+	for rows.Next() {
+		var pokemon domain.Pokemon
+		err := rows.Scan(&pokemon.Id, &pokemon.Name, &pokemon.Types, &pokemon.About.Species, &pokemon.About.Height, &pokemon.About.Weight, &pokemon.About.Abilities, &pokemon.Stats.HP, &pokemon.Stats.Attack, &pokemon.Stats.Defense, &pokemon.Stats.Speed)
+		helper.PanicIfError(err)
+		pokemons = append(pokemons, pokemon)
+	}
+
+	return pokemons, nil
+}
+
+// FindCollections implements PokemonRepository.
+func (pokemonRepositoryImpl *PokemonRepositoryImpl) FindCollections(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Pokemon, error) {
+	script := `SELECT id, name, types, species, height, weight, abilities, hp, attack, defense, speed
+	FROM pokemon 
+	INNER JOIN about ON pokemon.id = about.id_pokemon 
+	JOIN stats ON pokemon.id = stats.id_pokemon
+	WHERE id_user = ?
+	`
+	rows, err := tx.QueryContext(ctx, script, userId)
+	helper.PanicIfError(err)
+	defer rows.Close()
+
+	fmt.Println("ini di repo",userId)
+	fmt.Println("ini script", script)
 
 	var pokemons []domain.Pokemon
 	for rows.Next() {
@@ -133,9 +163,9 @@ func (pokemonRepositoryImpl PokemonRepositoryImpl) FindAllSpeciesByPokemonId(ctx
 	return species, nil
 }
 
-func (pokemonRepositoryImpl PokemonRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, pokemon domain.Pokemon, userId int) (domain.Pokemon, error) {
+func (pokemonRepositoryImpl PokemonRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, pokemon domain.Pokemon) (domain.Pokemon, error) {
 	scriptPokemon := "INSERT INTO pokemon(name, types, id_user) VALUES (?, ?, ?)"
-	resultPokemonTable, err := tx.ExecContext(ctx, scriptPokemon, pokemon.Name, pokemon.Types, userId)
+	resultPokemonTable, err := tx.ExecContext(ctx, scriptPokemon, pokemon.Name, pokemon.Types, pokemon.UserId)
 	helper.PanicIfError(err)
 
 	lastInsertId, err := resultPokemonTable.LastInsertId()
@@ -148,7 +178,6 @@ func (pokemonRepositoryImpl PokemonRepositoryImpl) Save(ctx context.Context, tx 
 	scriptAbout := "INSERT INTO about (species, height, weight, abilities, id_pokemon) VALUES (?, ?, ?, ?, ?)"
 	_, err = tx.ExecContext(ctx, scriptAbout, pokemon.About.Species, pokemon.About.Height, pokemon.About.Weight, pokemon.About.Abilities, lastInsertId)
 	helper.PanicIfError(err)
-
 
 	pokemon.Id = int(lastInsertId)
 	return pokemon, nil

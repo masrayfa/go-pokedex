@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"ngacak-go/exception"
 	"ngacak-go/helper"
 	"ngacak-go/model/domain"
@@ -14,6 +15,7 @@ import (
 
 type PokemonServiceImpl struct {
 	PokemonRepository repository.PokemonRepository
+	UserRepository repository.UserRepository
 	DB                *sql.DB
 	Validate          *validator.Validate
 }
@@ -54,13 +56,13 @@ func (service *PokemonServiceImpl) Create(ctx context.Context, req web.PokemonCr
 		UserId: req.UserId,
 	}
 
-	user, err := service.PokemonRepository.FindById(ctx, tx, req.UserId)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
+	// _, err = service.UserRepository.FindById(ctx, tx, req.UserId)
+	// if err != nil {
+	// 	panic(exception.NewNotFoundError(err.Error()))
+	// }
 
 	// pokemon := web.PokemonResponseToDomain(req)
-	res, err := service.PokemonRepository.Save(ctx, tx, pokemon, user.Id) 
+	res, err := service.PokemonRepository.Save(ctx, tx, pokemon) 
 	helper.PanicIfError(err)
 
 	return helper.ToPokemonResponse(res), nil
@@ -118,8 +120,32 @@ func (service *PokemonServiceImpl) FindAll(ctx context.Context) ([]web.PokemonRe
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	fmt.Println("ini dari service")
+
 	var pokemonResponses[]web.PokemonResponse
 	pokemons, err := service.PokemonRepository.FindAll(ctx, tx)
+	helper.PanicIfError(err)
+
+	for _, pokemon := range pokemons {
+		pokemonResponses = append(pokemonResponses, helper.ToPokemonResponse(pokemon))
+	}
+
+	return pokemonResponses, nil
+}
+
+// FindCollections implements PokemonService.
+func (service *PokemonServiceImpl) FindCollections(ctx context.Context, userId int) ([]web.PokemonResponse, error) {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	fmt.Println("ini dari service", userId)
+
+	// _, err = service.UserRepository.FindById(ctx, tx, userId)
+	// helper.PanicIfError(err)
+
+	var pokemonResponses[]web.PokemonResponse
+	pokemons, err := service.PokemonRepository.FindCollections(ctx, tx, userId)
 	helper.PanicIfError(err)
 
 	for _, pokemon := range pokemons {

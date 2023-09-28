@@ -123,3 +123,20 @@ func (controller *PokemonControllerImpl) FindByName (writer http.ResponseWriter,
 	errorResponse := encoder.Encode(webResponse)
 	helper.PanicIfError(errorResponse)
 }
+
+func (controller *PokemonControllerImpl) FindCollections (writer http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	userId := params.ByName("userId")
+	id, err := strconv.Atoi(userId)
+	helper.PanicIfError(err)
+
+	pokemonResponses, err := controller.PokemonService.FindCollections(req.Context(), id)
+	helper.PanicIfError(err)
+	
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   pokemonResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
