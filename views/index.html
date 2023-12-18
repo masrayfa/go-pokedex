@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar Pokemon</title>
+    <script
+      src="https://unpkg.com/htmx.org@1.9.9"
+      integrity="sha384-QFjmbokDn2DjBjq+fM+8LUIVrAgqcNW2s0PjAxHETgRn9l4fvX31ZxDxvwQnyMOX"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-[#F6F8FC]">
+    <img
+      src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pok%C3%A9mon_logo.svg"
+      alt="Pokemon Logo"
+      class="-z-10 top-10 absolute"
+    />
+    <div class="flex justify-center gap-5 bg-white p-8 shadow-lg rounded m-8 lg:my-20 lg:mx-72">
+      <div>
+        <p class="text-[#F95350] cursor-pointer">Home</p>
+      </div>
+      <div>
+        <p class="text-neutral-400 cursor-pointer"></p>Collections</p>
+      </div>
+    </div>
+    <div class="flex justify-center mb-12">
+      <ul class="md:grid md:grid-cols-3 md:gap-12 grid gap-5">
+        {{range .}}
+        <li class="p-12 bg-white shadow-lg rounded-lg text-center cursor-pointer">
+          <img src="{{.Sprites.FrontDefault}}" alt="poke">
+          <p>#{{ .ID}}</p>
+          <p>{{ .Name}}</p>
+          <div class="flex space-x-5">
+          {{range .Types}}
+            <span class=" p-1 bg-blue-700 rounded-lg text-white">{{.Type.Name}}</span>
+          {{end}}
+          </div>
+          <span class="flex space-x-5 text-center">
+            <p>{{ .Weight}} kg</p>
+            <p>{{ .Height}} m</p>
+          </span>
+        </li>
+        {{end}}
+      </ul>
+    </div>
+  </body>
+</html>

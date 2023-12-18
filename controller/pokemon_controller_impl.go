@@ -7,9 +7,12 @@ import (
 	"ngacak-go/model/web"
 	"ngacak-go/service"
 	"strconv"
+	"text/template"
 
 	"github.com/julienschmidt/httprouter"
 )
+
+var templates *template.Template
 
 type PokemonControllerImpl struct {
 	PokemonService service.PokemonService 
@@ -19,11 +22,8 @@ func NewPokemonController(pokemonService service.PokemonService) PokemonControll
 	return &PokemonControllerImpl{PokemonService: pokemonService}
 }
 
-func (controller *PokemonControllerImpl) Create(writer http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	// decoder := json.NewDecoder(req.Body)
-	// err := decoder.Decode(&pokemonCreateRequest)
-	// helper.PanicIfError(err)
 
+func (controller *PokemonControllerImpl) Create(writer http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	pokemonCreateRequest := web.PokemonCreateRequest{}
 	helper.ReadFromRequestBody(req, &pokemonCreateRequest)
 
@@ -39,10 +39,6 @@ func (controller *PokemonControllerImpl) Create(writer http.ResponseWriter, req 
 }
 
 func(controller *PokemonControllerImpl) Update (writer http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	// decoder := json.NewDecoder(req.Body)
-	// err := decoder.Decode(&pokemonUpdateRequest)
-	// helper.PanicIfError(err)
-
 	pokemonUpdateRequest := web.PokemonUpdateRequest{}
 	helper.ReadFromRequestBody(req, &web.PokemonUpdateRequest{})
 
@@ -78,6 +74,8 @@ func (controller *PokemonControllerImpl) Delete (writer http.ResponseWriter, req
 }
 
 func (controller *PokemonControllerImpl) FindAll (writer http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	// template := template.Must(template.ParseFiles("views/index.html"))
+	
 	pokemonResponses, err := controller.PokemonService.FindAll(req.Context())
 	helper.PanicIfError(err)
 	
@@ -88,6 +86,8 @@ func (controller *PokemonControllerImpl) FindAll (writer http.ResponseWriter, re
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+	// template.Execute(writer, webResponse)
 }
 
 func (controller *PokemonControllerImpl) FindById (writer http.ResponseWriter, req *http.Request, params httprouter.Params) {
